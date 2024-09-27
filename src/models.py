@@ -16,7 +16,7 @@ class Product(BaseModel):
     source: str
     source_icon: str
     thumbnail: str
-    delivery: str
+    delivery: Optional[str] = None
     extensions: Optional[list[str]] = None
     tag: Optional[str] = None
     serpapi_product_api: str

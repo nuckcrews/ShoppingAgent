@@ -1,4 +1,5 @@
 import sys, os
+from datetime import datetime
 from openai import OpenAI
 from .utils import announce, prompt_string
 from src import Agent
@@ -20,17 +21,27 @@ def main():
 
     announce(f"Searching for {query}...", prefix="🔍 ")
 
+    # Start timer
+    start_time = datetime.now()
+    
+    # Search
     result = agent.search(query)
+    
+    # End timer
+    end_timer = datetime.now()
 
     if not result:
-        announce("No products found. Please try again.", prefix="❌ ")
+        announce("\nNo products found. Please try again.", prefix="❌ ")
         sys.exit(1)
 
-    announce("Found the following products:", prefix="🎉 ")
+    announce("\nFound the following products:", prefix="🎉 ")
     
-    print(f"Summary: {result.summary}")
-
+    print(f"Summary:\n{result.summary}")
+    
+    print("\nProducts:")
     for product in result.products:
-        print(product)
+        print(f"{product}\n")
+        
+    announce(f"Total time taken: {end_timer - start_time}", prefix="⏱️ ")
 
     sys.exit(0)

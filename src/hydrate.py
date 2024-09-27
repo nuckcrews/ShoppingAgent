@@ -27,7 +27,7 @@ class Hydration:
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a helpful online shopping assistant that summarizes the search results for a given query and provides a reccomendation. Keep the summary short, concise and informative.",
+                    "content": "You are a helpful online shopping assistant that summarizes the search results for a given query and provides a reccomendation. Keep the summary to a single, concise sentence and informative.",
                 },
                 {
                     "role": "user", 
