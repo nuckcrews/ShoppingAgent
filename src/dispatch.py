@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from serpapi import GoogleSearch
 from openai import OpenAI
 from .models import Product, Filter
+from .error import NoResultsError
 from .utils import log, is_debug
 
 __all__ = ["Dispatcher", "RemoteResult"]
@@ -41,14 +42,18 @@ class Dispatcher:
             params = self._params(query)
             search = GoogleSearch(params)
             results = search.get_json()
+        
+        error = results.get("error")
+        if error:
+            raise NoResultsError(error)
 
         # Extract filters
         filters = self._extract_filters(filters=results.get("filters"))
 
-        # Filter results
-        products = self._filter_products(query, results.get("shopping_results"))
+        # Extract results
+        products = self._extract_products(products=results.get("shopping_results"))
 
-        log(lambda: f"Filtered results: {[p.title for p in products]}")
+        log(lambda: f"Extracted results: {[p.title for p in products]}")
         log(lambda: f"Filter Options: {[f.type for f in filters]}")
         return RemoteResult(products=products, filters=filters)
 
@@ -67,7 +72,7 @@ class Dispatcher:
             "google_domain": "google.com",
             "gl": "us",
             "hl": "en",
-            "direct_link": True,
+            "direct_link": "true",
         }
 
     def _extract_filters(self, filters: list[dict]) -> list[Filter]:
@@ -80,6 +85,15 @@ class Dispatcher:
 
         return [Filter(**f) for f in filters]
 
+    def _extract_products(self, products: list[dict]) -> list[Product]:
+        """Returns a list of the top 10 Product objects based on the provided products."""
+        
+        if not products:
+            return []
+        
+        return [Product(**p) for p in products[:10]]
+
+    # Legacy
     def _filter_products(self, query: str, products: list[dict]) -> list[Product]:
         """Returns a list of filtered products based on the provided query and results."""
         
