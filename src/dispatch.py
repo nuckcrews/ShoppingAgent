@@ -1,4 +1,4 @@
-import os, json, re
+import os, json, asyncio
 from urllib.parse import urlparse
 from urllib.parse import parse_qs
 from pydantic import BaseModel
@@ -7,7 +7,7 @@ from .models import Filter
 from .error import NoResultsError
 from .utils import log, is_debug
 
-__all__ = ["Dispatcher", "RemoteResult"]
+__all__ = ["Dispatcher", "RemoteResult", "SearchQuery"]
 
 
 class FilteredResult(BaseModel):
@@ -19,9 +19,21 @@ class FilteredResult(BaseModel):
 class RemoteResult(BaseModel):
     """A class to represent the results from the remote service."""
 
+    id: str
+    query: str
     products: list[dict]
     filters: list[Filter]
+    
+    def to_string(self):
+        model = self.model_dump()
+        # remove id
+        model.pop("id")
+        return json.dumps(model)
 
+class SearchQuery(BaseModel):
+    
+    id: str
+    text: str
 
 class Dispatcher:
     """A class to dispatch queries to remote services."""
@@ -30,24 +42,32 @@ class Dispatcher:
         """Initializes the Dispatcher object."""
         pass 
 
-    def search(self, query: str) -> RemoteResult:
+    def search(self, queries: list[SearchQuery]) -> list[RemoteResult]:
         """Returns a list of filtered results based on the provided query."""
 
-        # Get search parameters
-        params = self._search_params(query=query)
+        async def _search(query: SearchQuery) -> RemoteResult:
+            # Get search parameters
+            params = self._search_params(query=query.text)
 
-        # Dispatch the search
-        results = self._dispatch(params=params)
+            # Dispatch the search
+            results = await asyncio.to_thread(self._dispatch, params)
 
-        # Extract filters
-        filters = self._extract_filters(filters=results.get("filters"))
+            # Extract filters
+            filters = self._extract_filters(filters=results.get("filters"))
 
-        # Extract results
-        products = self._extract_products(products=results.get("shopping_results"))
+            # Extract results
+            products = self._extract_products(products=results.get("shopping_results"))
 
-        log(lambda: f"Extracted results: {[p.get("title") for p in products]}")
-        log(lambda: f"Filter Options: {[f.type for f in filters]}")
-        return RemoteResult(products=products, filters=filters)
+            log(lambda: f"Extracted results: {[p.get('title') for p in products]}")
+            log(lambda: f"Filter Options: {[f.type for f in filters]}")
+            return RemoteResult(id=query.id, query=query.text, products=products, filters=filters)
+        
+        async def _run_searches():
+            return await asyncio.gather(*[_search(query) for query in queries])
+
+        # Run the searches in parallel
+        results = asyncio.run(_run_searches())
+        return results
 
     def filter(self, link: str) -> RemoteResult:
         """Returns a list of filtered results based on the provided link."""
@@ -68,7 +88,7 @@ class Dispatcher:
 
         log(lambda: f"Extracted results: {[p.get("title") for p in products]}")
         log(lambda: f"Filter Options: {[f.type for f in filters]}")
-        return RemoteResult(products=products, filters=filters)
+        return RemoteResult(id="", query=link, products=products, filters=filters)
 
     def details(self, link: str) -> dict:
         """Returns a list of filtered results based on the provided link."""

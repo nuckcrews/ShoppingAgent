@@ -7,7 +7,7 @@ from openai.types.beta.threads.runs import ToolCall, ToolCallDelta
 from openai.types.beta.threads import Message, MessageDelta
 from openai.types.beta.threads.runs import ToolCall, RunStep
 from openai.types.beta import AssistantStreamEvent
-from .dispatch import Dispatcher
+from .dispatch import Dispatcher, SearchQuery
 from .utils import log
 
 __all__ = ["Runner"]
@@ -66,7 +66,8 @@ class EventHandler(AssistantEventHandler):
         self.thread_id = thread_id
         self.run_id = None
         self.run_step = None
-        self.tool_calls: list[ToolCall] = []
+        self.non_search_tool_calls: list[ToolCall] = []
+        self.search_tool_calls: list[ToolCall] = []
 
     @override
     def on_end(self):
@@ -97,13 +98,23 @@ class EventHandler(AssistantEventHandler):
             return
 
         elif keep_retrieving_run.status == "in_progress":
-            self.tool_calls.append(tool_call)
+            
+            
+            if tool_call.function.name == "execute_search":
+                self.search_tool_calls.append(tool_call)
+            else:
+                self.non_search_tool_calls.append(tool_call)
+                
         elif keep_retrieving_run.status == "requires_action":
-            self.tool_calls.append(tool_call)
+            if tool_call.function.name == "execute_search":
+                self.search_tool_calls.append(tool_call)
+            else:
+                self.non_search_tool_calls.append(tool_call)
 
             tool_outputs = []
-
-            for tool_call in self.tool_calls:
+            
+            queries: list[SearchQuery] = []
+            for tool_call in self.search_tool_calls:
                 name = tool_call.function.name
                 arguments = json.loads(tool_call.function.arguments)
 
@@ -112,16 +123,24 @@ class EventHandler(AssistantEventHandler):
                     if not query:
                         raise ValueError("No query provided to search")
 
-                    search_results = self.dispatcher.search(query)
-
+                    queries.append(SearchQuery(id=tool_call.id, text=query))
+                    
+            if len(queries) > 0:
+                search_results = self.dispatcher.search(queries)
+                
+                for result in search_results:
                     tool_outputs.append(
                         {
-                            "tool_call_id": tool_call.id,
-                            "output": search_results.model_dump_json(),
+                            "tool_call_id": result.id,
+                            "output": result.to_string(),
                         }
                     )
 
-                elif name == "filter_results":
+            for tool_call in self.non_search_tool_calls:
+                name = tool_call.function.name
+                arguments = json.loads(tool_call.function.arguments)
+
+                if name == "filter_results":
                     link = arguments.get("serpapi_link")
                     if not link:
                         raise ValueError("No link provided to filter")
@@ -131,7 +150,7 @@ class EventHandler(AssistantEventHandler):
                     tool_outputs.append(
                         {
                             "tool_call_id": tool_call.id,
-                            "output": filter_results.model_dump_json(),
+                            "output": filter_results.to_string(),
                         }
                     )
 
