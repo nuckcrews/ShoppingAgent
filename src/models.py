@@ -1,7 +1,18 @@
 from typing import Optional
 from pydantic import BaseModel
+from enum import Enum
 
-__all__ = ["Product", "Filter", "Response"]
+__all__ = [
+    "Product",
+    "Filter",
+    "Response",
+    "ResponseType",
+    "ProductsResponse",
+    "DetailsResponse",
+    "CompareResponse",
+    "TextResponse",
+    "ErrorResponse",
+]
 
 
 class Product(BaseModel):
@@ -34,9 +45,48 @@ class Filter(BaseModel):
     options: list[dict]
 
 
-class Response(BaseModel):
-    """A class to represent the agent response."""
+class ResponseType(str, Enum):
+    products = "products"
+    details = "details"
+    compare = "compare"
+    text = "text"
+    error = "error"
 
-    summary: str
-    products: list[Product]
+
+class ResponseModel(BaseModel):
+    pass
+
+
+class ErrorResponse(ResponseModel):
+
+    message: str
+
+
+class ProductsResponse(ResponseModel):
+
+    text: str
+    products: list[dict]
     filters: list[Filter]
+
+
+class DetailsResponse(ResponseModel):
+
+    text: str
+    product: dict
+
+
+class CompareResponse(ResponseModel):
+
+    text: str
+    products: list[dict]
+
+
+class TextResponse(ResponseModel):
+
+    text: str
+
+
+class Response(BaseModel):
+
+    type: ResponseType
+    model: ResponseModel

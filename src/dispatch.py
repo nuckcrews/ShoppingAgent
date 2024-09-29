@@ -1,8 +1,9 @@
-import os, json
+import os, json, re
+from urllib.parse import urlparse
+from urllib.parse import parse_qs
 from pydantic import BaseModel
 from serpapi import GoogleSearch
-from openai import OpenAI
-from .models import Product, Filter
+from .models import Filter
 from .error import NoResultsError
 from .utils import log, is_debug
 
@@ -18,34 +19,25 @@ class FilteredResult(BaseModel):
 class RemoteResult(BaseModel):
     """A class to represent the results from the remote service."""
 
-    products: list[Product]
+    products: list[dict]
     filters: list[Filter]
 
 
 class Dispatcher:
     """A class to dispatch queries to remote services."""
 
-    def __init__(self, client: OpenAI):
+    def __init__(self):
         """Initializes the Dispatcher object."""
+        pass 
 
-        self.client = client
-
-    def dispatch(self, query: str) -> RemoteResult:
+    def search(self, query: str) -> RemoteResult:
         """Returns a list of filtered results based on the provided query."""
 
-        if is_debug:
-            # Extract data from ./resources/example_response.json
-            with open("./resources/example_response.json") as f:
-                results = json.load(f)
-        else:
-            # Request SERP API
-            params = self._params(query)
-            search = GoogleSearch(params)
-            results = search.get_json()
-        
-        error = results.get("error")
-        if error:
-            raise NoResultsError(error)
+        # Get search parameters
+        params = self._search_params(query=query)
+
+        # Dispatch the search
+        results = self._dispatch(params=params)
 
         # Extract filters
         filters = self._extract_filters(filters=results.get("filters"))
@@ -53,11 +45,69 @@ class Dispatcher:
         # Extract results
         products = self._extract_products(products=results.get("shopping_results"))
 
-        log(lambda: f"Extracted results: {[p.title for p in products]}")
+        log(lambda: f"Extracted results: {[p.get("title") for p in products]}")
         log(lambda: f"Filter Options: {[f.type for f in filters]}")
         return RemoteResult(products=products, filters=filters)
 
-    def _params(self, query: str) -> dict:
+    def filter(self, link: str) -> RemoteResult:
+        """Returns a list of filtered results based on the provided link."""
+
+        # Extract params from link (its a url)
+        parsed = urlparse(link)
+        params = parse_qs(parsed.query)
+        params_dict = {k: v[0] for k, v in params.items()}
+
+        # Dispatch the search
+        results = self._dispatch(params=params_dict)
+
+        # Extract filters
+        filters = self._extract_filters(filters=results.get("filters"))
+
+        # Extract results
+        products = self._extract_products(products=results.get("shopping_results"))
+
+        log(lambda: f"Extracted results: {[p.get("title") for p in products]}")
+        log(lambda: f"Filter Options: {[f.type for f in filters]}")
+        return RemoteResult(products=products, filters=filters)
+
+    def details(self, link: str) -> dict:
+        """Returns a list of filtered results based on the provided link."""
+
+        # Extract params from link (its a url)
+        parsed = urlparse(link)
+        params = parse_qs(parsed.query)
+        params_dict = {k: v[0] for k, v in params.items()}
+
+        # Dispatch the search
+        results = self._dispatch(params=params_dict)
+        
+        # Remove unnecessary fields
+        results.pop("search_parameters", None)
+        results.pop("search_metadata", None)
+
+        log(lambda: f"Extracted results: {results.get('product_results').get("title")}")
+        # Extract results
+        return results
+
+    def _dispatch(self, params: dict) -> dict:
+        """Dispatches the provided parameters to the remote service."""
+
+        if is_debug:
+            # Extract data from ./resources/example_response.json
+            with open("./resources/example_response.json") as f:
+                results = json.load(f)
+        else:
+            # Request SERP API
+            search = GoogleSearch(params)
+            results = search.get_json()
+
+        error = results.get("error")
+        if error:
+            raise NoResultsError(error)
+
+        return results
+
+    def _search_params(self, query: str) -> dict:
         """Returns the parameters for the remote service based on the provided query."""
         serp_api_key = os.getenv("SERP_API_KEY")
 
@@ -85,53 +135,13 @@ class Dispatcher:
 
         return [Filter(**f) for f in filters]
 
-    def _extract_products(self, products: list[dict]) -> list[Product]:
+    def _extract_products(self, products: list[dict]) -> list[dict]:
         """Returns a list of the top 10 Product objects based on the provided products."""
-        
-        if not products:
-            return []
-        
-        return [Product(**p) for p in products[:10]]
 
-    # Legacy
-    def _filter_products(self, query: str, products: list[dict]) -> list[Product]:
-        """Returns a list of filtered products based on the provided query and results."""
-        
         if not products:
             return []
 
-        completion = self.client.beta.chat.completions.parse(
-            model="gpt-4o-mini",
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are a helpful online shopping assistant that breaks down search results to identify the top 5 products based on the user's query and preferences. Please identify the positions of the top 5 products in the search results. Do not let the listed positions influence you.",
-                },
-                {
-                    "role": "user", 
-                    "content": f"Query: {query}"
-                },
-                {
-                    "role": "user", 
-                    "content": f"Results: {products}"
-                },
-            ],
-            response_format=FilteredResult,
-        )
-
-        filtered_positions = completion.choices[0].message.parsed.results_positions
-        log(lambda: f"Filtered positions: {filtered_positions}")
-
-        if not filtered_positions:
-            return []
-
-        refind_results = []
-        for position in filtered_positions:
-            p = position - 1
-            if p >= 0 and p < len(products):
-                refind_results.append(Product(**products[p]))
-
-        return refind_results
+        return products[:10]
 
     def __str__(self):
         return self.__class__.__name__

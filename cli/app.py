@@ -1,8 +1,8 @@
 import sys, os
 from datetime import datetime
 from openai import OpenAI
-from .utils import announce, prompt_string
-from src import Agent
+from .utils import announce, prompt_string, prompt_confirm
+from src import Agent, ProductsResponse
 
 
 def main():
@@ -16,32 +16,25 @@ def main():
     agent = Agent(client)
 
     announce("Welcome to the Shoppy CLI app", prefix="👋 ")
-
-    query = prompt_string("What are you looking for?")
-
-    announce(f"Searching for {query}...", prefix="🔍 ")
-
-    # Start timer
-    start_time = datetime.now()
     
-    # Search
-    result = agent.search(query)
-    
-    # End timer
-    end_timer = datetime.now()
-
-    if not result:
-        announce("\nNo products found. Please try again.", prefix="❌ ")
-        sys.exit(1)
-
-    announce("\nFound the following products:", prefix="🎉 ")
-    
-    print(f"Summary:\n{result.summary}")
-    
-    print("\nProducts:")
-    for product in result.products:
-        print(f"{product}\n")
+    while True:
+        query = prompt_string("What are you looking for?")
+        announce(f"Searching for {query}...", prefix="🔍 ")
         
-    announce(f"Total time taken: {end_timer - start_time}", prefix="⏱️ ")
+        # Start timer
+        start_time = datetime.now()
+        
+        # Search
+        agent.search(query)
+        
+        # End timer
+        end_timer = datetime.now()
+    
+        announce(f"\nTotal time taken: {end_timer - start_time}", prefix="⏱️ ")
+        
+        should_continue = prompt_confirm("Do you want to continue?", default=True)
+        
+        if not should_continue:
+            break
 
     sys.exit(0)

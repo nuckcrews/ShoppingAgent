@@ -1,0 +1,178 @@
+{
+    "search_metadata": {
+        "id": "66f87d151ec32f0a78c3aca9",
+        "status": "Success",
+        "json_endpoint": "https://serpapi.com/searches/947247ad4e998f98/66f87d151ec32f0a78c3aca9.json",
+        "created_at": "2024-09-28 22:03:01 UTC",
+        "processed_at": "2024-09-28 22:03:01 UTC",
+        "google_product_url": "https://www.google.com/shopping/product/13035744456826473760?uule=w+CAIQICIWTmV3IFlvcmssVW5pdGVkIFN0YXRlcw&gl=us&hl=en&prds=pid:13035744456826473760&sourceid=chrome&ie=UTF-8",
+        "raw_html_file": "https://serpapi.com/searches/947247ad4e998f98/66f87d151ec32f0a78c3aca9.html",
+        "total_time_taken": 0.33
+    },
+    "search_parameters": {
+        "engine": "google_product",
+        "product_id": "13035744456826473760",
+        "location_requested": "New York, United States",
+        "location_used": "New York,United States",
+        "google_domain": "google.com",
+        "hl": "en",
+        "gl": "us",
+        "device": "desktop"
+    },
+    "product_results": {
+        "product_id": "13035744456826473760",
+        "title": "Men's New York Vintage-Inspired Graphic Tee in Cream | Size XXL | Abercrombie & Fitch",
+        "prices": [
+            "$29.00"
+        ],
+        "conditions": [
+            "New"
+        ],
+        "typical_prices": {
+            "shown_price": "$29.00 at Abercrombie & Fitch"
+        },
+        "reviews": 9,
+        "rating": 4.9,
+        "extensions": [
+            "Graphic",
+            "Men's",
+            "XXL",
+            "Cotton",
+            "Round Neck",
+            "Short Sleeve",
+            "Cream",
+            "Regular"
+        ],
+        "description": "Classic short-sleeve tee in our softAF 180g fabric and vintage oversized-fit silhouette, featuring New York-inspired graphic detail at chest and crew neckline.",
+        "media": [
+            {
+                "type": "image",
+                "link": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTHPIKEAQ540E4ATBR2UySTCYI5Va_0lBBrwAIdz1sk6m8O4vv5zFmUGzePKEJrqHI_ByoTyhe2lTT2QOLznBOodf4Mv1svsg&usqp=CAY"
+            },
+            {
+                "type": "image",
+                "link": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcR5gNMP1ki0icUC73q-UKssDYoWuWk3gJmkbOr2h7xF4sdz_JFK&usqp=CAY"
+            },
+            {
+                "type": "image",
+                "link": "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcR1gbh154I-JowpCmJ_RZRH2An_Lqpc20ovOc0DLYQ_bp5twBTP_f6M-h-cc2721Jd0kpgNc2YOQR_up3SPW2DYyUj2q_Bh&usqp=CAY"
+            },
+            {
+                "type": "image",
+                "link": "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcTY5kxXQB8xwuvy9mSuhaNZaUdhMbAsoB5AmzUmESP3OLLhkkQeEomTaiPOwiLQ5kZfDXdvY1DLd6nF0rUgpJRlBnMon2sz&usqp=CAY"
+            }
+        ],
+        "sizes": {
+            "xxl": {
+                "link": "https://www.google.com/shopping/product/13035744456826473760?uule=w+CAIQICIWTmV3IFlvcmssVW5pdGVkIFN0YXRlcw&gl=us&hl=en&prds=pid:13035744456826473760&sourceid=chrome&ie=UTF-8",
+                "product_id": "13035744456826473760",
+                "selected": true,
+                "serpapi_link": "https://serpapi.com/search.json?device=desktop&engine=google_product&gl=us&google_domain=google.com&hl=en&location=New+York%2C+United+States&product_id=13035744456826473760"
+            },
+            "xs": {
+                "link": "https://www.google.com/shopping/product/8267961346713642296?uule=w+CAIQICIWTmV3IFlvcmssVW5pdGVkIFN0YXRlcw&prds=opd:8687165696765848898,rsk:PC_10268144265550439430&sa=X&ved=0ahUKEwir35KV0uaIAxXavokEHfLdJw8QlIUHCC8oAA",
+                "product_id": "8267961346713642296",
+                "serpapi_link": "https://serpapi.com/search.json?device=desktop&engine=google_product&gl=us&google_domain=google.com&hl=en&location=New+York%2C+United+States&product_id=8267961346713642296"
+            },
+            "s": {
+                "link": "https://www.google.com/shopping/product/9252458094250063981?uule=w+CAIQICIWTmV3IFlvcmssVW5pdGVkIFN0YXRlcw&prds=opd:8687165696765848898,rsk:PC_10268144265550439430&sa=X&ved=0ahUKEwir35KV0uaIAxXavokEHfLdJw8QlIUHCDAoAQ",
+                "product_id": "9252458094250063981",
+                "serpapi_link": "https://serpapi.com/search.json?device=desktop&engine=google_product&gl=us&google_domain=google.com&hl=en&location=New+York%2C+United+States&product_id=9252458094250063981"
+            },
+            "m": {
+                "link": "https://www.google.com/shopping/product/8000704498504876535?uule=w+CAIQICIWTmV3IFlvcmssVW5pdGVkIFN0YXRlcw&prds=opd:8687165696765848898,rsk:PC_10268144265550439430&sa=X&ved=0ahUKEwir35KV0uaIAxXavokEHfLdJw8QlIUHCDEoAg",
+                "product_id": "8000704498504876535",
+                "serpapi_link": "https://serpapi.com/search.json?device=desktop&engine=google_product&gl=us&google_domain=google.com&hl=en&location=New+York%2C+United+States&product_id=8000704498504876535"
+            },
+            "l": {
+                "link": "https://www.google.com/shopping/product/12907843192605491610?uule=w+CAIQICIWTmV3IFlvcmssVW5pdGVkIFN0YXRlcw&prds=opd:8687165696765848898,rsk:PC_10268144265550439430&sa=X&ved=0ahUKEwir35KV0uaIAxXavokEHfLdJw8QlIUHCDIoAw",
+                "product_id": "12907843192605491610",
+                "serpapi_link": "https://serpapi.com/search.json?device=desktop&engine=google_product&gl=us&google_domain=google.com&hl=en&location=New+York%2C+United+States&product_id=12907843192605491610"
+            },
+            "xl": {
+                "link": "https://www.google.com/shopping/product/12777706599017831821?uule=w+CAIQICIWTmV3IFlvcmssVW5pdGVkIFN0YXRlcw&prds=opd:8687165696765848898,rsk:PC_10268144265550439430&sa=X&ved=0ahUKEwir35KV0uaIAxXavokEHfLdJw8QlIUHCDMoBA",
+                "product_id": "12777706599017831821",
+                "serpapi_link": "https://serpapi.com/search.json?device=desktop&engine=google_product&gl=us&google_domain=google.com&hl=en&location=New+York%2C+United+States&product_id=12777706599017831821"
+            }
+        }
+    },
+    "sellers_results": {
+        "online_sellers": [
+            {
+                "position": 1,
+                "name": "Abercrombie & Fitch",
+                "payment_methods": "PayPal, Google Pay accepted",
+                "link": "https://www.google.com/url?q=https://www.abercrombie.com/shop/us/p/new-york-vintage-inspired-graphic-tee-57732945%3Fseq%3D01%26source%3Dgoogleshopping&opi=95576897&sa=U&ved=0ahUKEwir35KV0uaIAxXavokEHfLdJw8Q2ykITg&usg=AOvVaw0KSWzTBHeJKSsWzg2rrjVo",
+                "direct_link": "https://www.abercrombie.com/shop/us/p/new-york-vintage-inspired-graphic-tee-57732945?seq=01&source=googleshopping",
+                "details_and_offers": [
+                    {
+                        "text": "Delivery by Thu, Oct 3"
+                    },
+                    {
+                        "text": "Spend $99 for free delivery"
+                    }
+                ],
+                "base_price": "$29.00",
+                "additional_price": {
+                    "shipping": "$7.00",
+                    "tax": "$3.20"
+                },
+                "total_price": "$39.20"
+            }
+        ]
+    },
+    "reviews_results": {
+        "ratings": [
+            {
+                "stars": 1,
+                "amount": 0
+            },
+            {
+                "stars": 2,
+                "amount": 0
+            },
+            {
+                "stars": 3,
+                "amount": 0
+            },
+            {
+                "stars": 4,
+                "amount": 1
+            },
+            {
+                "stars": 5,
+                "amount": 8
+            }
+        ],
+        "filters": [
+            {
+                "label": "Comfort",
+                "count": 1
+            },
+            {
+                "label": "Craftsmanship",
+                "count": 1
+            }
+        ],
+        "reviews": [
+            {
+                "position": 1,
+                "title": "Epitome of Fall",
+                "date": "September 15, 2024",
+                "rating": 5,
+                "source": "PublicName99 · Review provided by abercrombie.com",
+                "content": "I usually don't go for graphic tees, especially cheesy ones with city names on them, but the graphic on this one was just too perfect to pass up. It's got such a vintage fall-in-NY vibe with vibrant colors that look just as good in person. If you like the fit and don't mind a thicker collar, this is the perfect shirt for fall. "
+            }
+        ]
+    },
+    "product_variations": [
+        {
+            "thumbnail": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTSnywOkHoZ8iBMgZUVBv9XFaEPUX9tUYzmmEe4Q3au6PWZEAVBkWqXv-Lxb52CRPInkMkggErjMfYqrjO5FB_9Zc4QEeoY1K9INrzhaQJMa-6ayCxNyW0&usqp=CAY"
+        },
+        {
+            "link": "https://www.google.com/shopping/product/666606503931576045?uule=w+CAIQICIWTmV3IFlvcmssVW5pdGVkIFN0YXRlcw&prds=opd:8687165696765848898,rsk:PC_10268144265550439430&sa=X&ved=0ahUKEwir35KV0uaIAxXavokEHfLdJw8QlIUHCC0oAQ",
+            "serpapi_link": "https://serpapi.com/search.json?device=desktop&engine=google_product&gl=us&google_domain=google.com&hl=en&product_id=666606503931576045&uule=w%20CAIQICIWTmV3IFlvcmssVW5pdGVkIFN0YXRlcw",
+            "thumbnail": "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRWQAwaD0VI11Bb1FJsic1dMopCgzJKI_0SmXQfaIcQEJybcY_bpIWft_VL9SErb3mSEWJ8fc4kFeaXT2EY7hxvBWeYKsTBBtCBdCuafEdcjB2AHIGYbsk&usqp=CAY"
+        }
+    ]
+}
