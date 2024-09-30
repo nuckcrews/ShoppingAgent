@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, json
 from datetime import datetime
 from openai import OpenAI
 from .utils import announce, prompt_string, prompt_confirm
@@ -13,7 +13,16 @@ def main():
         sys.exit(1)
 
     client = OpenAI(api_key=api_key)
-    agent = Agent(client)
+    
+    def on_product_list(products: list[dict]):
+        announce("Results:", prefix="📦 ")
+        for product in products:
+            print(json.dumps(product, indent=4))
+            
+    def on_text_changed(text: str):
+        print(text, end="", flush=True)
+    
+    agent = Agent(client, on_product_list=on_product_list, on_text_changed=on_text_changed)
 
     announce("Welcome to the Shoppy CLI app", prefix="👋 ")
     
@@ -30,7 +39,7 @@ def main():
         # End timer
         end_timer = datetime.now()
     
-        announce(f"\nTotal time taken: {end_timer - start_time}", prefix="⏱️ ")
+        announce(f"\nTotal time taken: {end_timer - start_time}\n", prefix="⏱️ ")
         
         should_continue = prompt_confirm("Do you want to continue?", default=True)
         

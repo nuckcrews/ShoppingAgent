@@ -17,9 +17,17 @@ class Runner:
 
     _assistant_id = "asst_0ikYWUWwI9pm3wyousqovlNp"
 
-    def __init__(self, client: OpenAI, dispatcher: Dispatcher, thread_id: str = None):
+    def __init__(
+        self,
+        client: OpenAI,
+        on_product_list: callable,
+        on_text_changed: callable,
+        thread_id: str = None,
+    ):
         self.client = client
-        self.dispatcher = dispatcher
+        self.dispatcher = Dispatcher()
+        self.on_product_list = on_product_list
+        self.on_text_changed = on_text_changed
         if not thread_id:
             thread = self.client.beta.threads.create()
             self.thread_id = thread.id
@@ -41,7 +49,11 @@ class Runner:
         )
 
         event_handler = EventHandler(
-            client=self.client, dispatcher=self.dispatcher, thread_id=self.thread_id
+            client=self.client, 
+            dispatcher=self.dispatcher, 
+            thread_id=self.thread_id,
+            on_product_list=self.on_product_list,
+            on_text_changed=self.on_text_changed,
         )
 
         # Create a new run
@@ -59,7 +71,14 @@ class Runner:
 class EventHandler(AssistantEventHandler):
     """A class to handle assistant events."""
 
-    def __init__(self, client: OpenAI, dispatcher: Dispatcher, thread_id: str):
+    def __init__(
+        self,
+        client: OpenAI,
+        dispatcher: Dispatcher,
+        thread_id: str,
+        on_product_list: callable,
+        on_text_changed: callable,
+    ):
         super().__init__()
         self.client = client
         self.dispatcher = dispatcher
@@ -68,6 +87,8 @@ class EventHandler(AssistantEventHandler):
         self.run_step = None
         self.non_search_tool_calls: list[ToolCall] = []
         self.search_tool_calls: list[ToolCall] = []
+        self.on_product_list = on_product_list
+        self.on_text_changed = on_text_changed
 
     @override
     def on_end(self):
@@ -98,13 +119,12 @@ class EventHandler(AssistantEventHandler):
             return
 
         elif keep_retrieving_run.status == "in_progress":
-            
-            
+
             if tool_call.function.name == "execute_search":
                 self.search_tool_calls.append(tool_call)
             else:
                 self.non_search_tool_calls.append(tool_call)
-                
+
         elif keep_retrieving_run.status == "requires_action":
             if tool_call.function.name == "execute_search":
                 self.search_tool_calls.append(tool_call)
@@ -112,7 +132,7 @@ class EventHandler(AssistantEventHandler):
                 self.non_search_tool_calls.append(tool_call)
 
             tool_outputs = []
-            
+
             queries: list[SearchQuery] = []
             for tool_call in self.search_tool_calls:
                 name = tool_call.function.name
@@ -124,10 +144,10 @@ class EventHandler(AssistantEventHandler):
                         raise ValueError("No query provided to search")
 
                     queries.append(SearchQuery(id=tool_call.id, text=query))
-                    
+
             if len(queries) > 0:
                 search_results = self.dispatcher.search(queries)
-                
+
                 for result in search_results:
                     tool_outputs.append(
                         {
@@ -135,6 +155,7 @@ class EventHandler(AssistantEventHandler):
                             "output": result.to_string(),
                         }
                     )
+                    self.on_product_list(result.products)
 
             for tool_call in self.non_search_tool_calls:
                 name = tool_call.function.name
@@ -154,6 +175,8 @@ class EventHandler(AssistantEventHandler):
                         }
                     )
 
+                    self.on_product_list(filter_results.products)
+
                 elif name == "get_product_details":
                     link = arguments.get("serpapi_product_api")
                     if not link:
@@ -164,14 +187,18 @@ class EventHandler(AssistantEventHandler):
                     tool_outputs.append(
                         {
                             "tool_call_id": tool_call.id,
-                            "output": product_details,
+                            "output": json.dumps(product_details),
                         }
                     )
+
+                    self.on_product_list([product_details])
 
             event_handler = EventHandler(
                 client=self.client,
                 dispatcher=self.dispatcher,
                 thread_id=self.thread_id,
+                on_product_list=self.on_product_list,
+                on_text_changed=self.on_text_changed,
             )
 
             with self.client.beta.threads.runs.submit_tool_outputs_stream(
@@ -199,6 +226,15 @@ class EventHandler(AssistantEventHandler):
         return super().on_run_step_done(run_step)
 
     # MARK - Message and text events
+
+    @override
+    def on_text_delta(self, delta: TextDelta, snapshot: Text) -> None:
+        self.on_text_changed(delta.value)
+        return super().on_text_delta(delta, snapshot)
+
+    @override
+    def on_message_delta(self, delta: MessageDelta, snapshot: Message) -> None:
+        return super().on_message_delta(delta, snapshot)
 
     @override
     def on_message_created(self, message: Message) -> None:

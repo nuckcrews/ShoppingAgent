@@ -76,6 +76,12 @@ class Dispatcher:
         parsed = urlparse(link)
         params = parse_qs(parsed.query)
         params_dict = {k: v[0] for k, v in params.items()}
+        
+        serp_api_key = os.getenv("SERP_API_KEY")
+        if not serp_api_key:
+            raise ValueError("SERP_API_KEY environment variable is not set.")
+
+        params_dict["api_key"] = serp_api_key
 
         # Dispatch the search
         results = self._dispatch(params=params_dict)
@@ -97,6 +103,12 @@ class Dispatcher:
         parsed = urlparse(link)
         params = parse_qs(parsed.query)
         params_dict = {k: v[0] for k, v in params.items()}
+        
+        serp_api_key = os.getenv("SERP_API_KEY")
+        if not serp_api_key:
+            raise ValueError("SERP_API_KEY environment variable is not set.")
+
+        params_dict["api_key"] = serp_api_key
 
         # Dispatch the search
         results = self._dispatch(params=params_dict)
