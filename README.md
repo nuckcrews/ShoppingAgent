@@ -1,6 +1,6 @@
-# Shoppy Agent
+# Shopping Agent
 
-Find products you love.
+An AI Agent that helps you shop.
 
 ## Repository Setup
 
