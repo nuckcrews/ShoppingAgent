@@ -3,13 +3,19 @@ from urllib.parse import urlparse
 from urllib.parse import parse_qs
 from pydantic import BaseModel
 from serpapi import GoogleSearch
-from .models import Filter
 from .error import NoResultsError
-from .utils import log, is_debug
+from .utils import log
 
 __all__ = ["Dispatcher", "RemoteResult", "SearchQuery"]
 
 
+class Filter(BaseModel):
+    """A class to represent a filter."""
+
+    type: str
+    options: list[dict]
+
+    
 class FilteredResult(BaseModel):
     """A class to represent the filtered results from the model."""
 
@@ -124,14 +130,9 @@ class Dispatcher:
     def _dispatch(self, params: dict) -> dict:
         """Dispatches the provided parameters to the remote service."""
 
-        if is_debug:
-            # Extract data from ./resources/example_response.json
-            with open("./resources/example_response.json") as f:
-                results = json.load(f)
-        else:
-            # Request SERP API
-            search = GoogleSearch(params)
-            results = search.get_json()
+        # Request SERP API
+        search = GoogleSearch(params)
+        results = search.get_json()
 
         error = results.get("error")
         if error:

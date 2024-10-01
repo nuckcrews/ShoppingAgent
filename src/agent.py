@@ -1,7 +1,5 @@
 from openai import OpenAI
-from .dispatch import Dispatcher
 from .runner import Runner
-from .models import Response, DetailsResponse, ProductsResponse
 
 __all__ = ["Agent"]
 
@@ -19,7 +17,7 @@ class Agent:
         """Initializes the Agent object with the provided OpenAI client."""
         self.runner = Runner(client, on_product_list, on_text_changed, thread_id)
 
-    def search(self, input: str) -> Response:
+    def search(self, input: str):
         """The default run execution."""
         self.runner.start(input)
 

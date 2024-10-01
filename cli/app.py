@@ -2,7 +2,7 @@ import sys, os, json
 from datetime import datetime
 from openai import OpenAI
 from .utils import announce, prompt_string, prompt_confirm
-from src import Agent, ProductsResponse
+from src import Agent
 
 
 def main():
